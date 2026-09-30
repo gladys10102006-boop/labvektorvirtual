@@ -1491,106 +1491,108 @@ elif st.session_state.page == "HOTS":
 
     st.markdown(
         '<div class="section-subtitle">'
-        'Gunakan data hasil eksperimen sebagai dasar jawaban.'
+        'Gunakan tabel dan grafik hasil eksperimen sebagai dasar jawaban. '
+        'Jawaban tidak hanya berdasarkan hafalan rumus, tetapi berdasarkan pola data.'
         '</div>',
         unsafe_allow_html=True
     )
 
-    if len(st.session_state.trials) < 1:
+    # HOTS dikerjakan setelah minimal 5 percobaan sesuai petunjuk investigasi.
+    if len(st.session_state.trials) < 5:
 
         st.warning(
-            "Lakukan minimal satu percobaan sebelum menjawab HOTS."
+            f"Kumpulkan minimal 5 percobaan terlebih dahulu. "
+            f"Saat ini baru tersedia {len(st.session_state.trials)} percobaan."
+        )
+
+        st.info(
+            "Tips: ubah sudut dan/atau besar gaya pada beberapa percobaan. "
+            "Usahakan ada beberapa percobaan dengan massa tetap agar pengaruh sudut "
+            "terhadap resultan lebih mudah dianalisis."
         )
 
     else:
 
         df = pd.DataFrame(st.session_state.trials)
 
-        min_resultant = df["R (N)"].min()
-        max_resultant = df["R (N)"].max()
+        min_idx = df["R (N)"].idxmin()
+        max_idx = df["R (N)"].idxmax()
+
+        min_row = df.loc[min_idx]
+        max_row = df.loc[max_idx]
+
+        min_resultant = min_row["R (N)"]
+        max_resultant = max_row["R (N)"]
 
         questions = [
 
             (
                 "C4 — Analisis",
                 f"""
-                Berdasarkan data percobaan yang diperoleh,
-                resultan terkecil yang tercatat adalah
-                {min_resultant:.3f} N dan resultan terbesar
-                {max_resultant:.3f} N.
+                Berdasarkan tabel hasil eksperimen, resultan terkecil adalah
+                {min_resultant:.3f} N pada percobaan ke-{int(min_row['Percobaan'])},
+                sedangkan resultan terbesar adalah {max_resultant:.3f} N pada
+                percobaan ke-{int(max_row['Percobaan'])}.
 
-                Faktor apa yang paling mungkin menyebabkan
-                perubahan besar resultan tersebut?
+                Pernyataan yang paling sesuai untuk menjelaskan perbedaan tersebut adalah ...
                 """,
                 [
-                    "Perubahan warna alat",
-                    "Perubahan sudut atau besar gaya",
-                    "Perubahan nama percobaan",
-                    "Perubahan satuan waktu"
+                    "Perubahan besar dan/atau arah gaya mengubah komponen Rx dan Ry sehingga resultan dapat berubah",
+                    "Besar resultan hanya ditentukan oleh nomor percobaan",
+                    "Arah gaya tidak berpengaruh selama jumlah gaya tetap",
+                    "Resultan selalu sama jika percobaan dilakukan lebih dari satu kali"
                 ],
-                1
+                0
             ),
 
             (
                 "C4 — Analisis",
-                """
-                Jika dua gaya memiliki besar yang sama dan
-                sudut antara keduanya semakin mendekati 180°,
-                bagaimana kecenderungan besar resultannya?
-                """,
+                "Jika dua gaya memiliki besar yang sama dan sudut antara keduanya semakin mendekati 180°, "
+                "pola data yang seharusnya diamati adalah ...",
                 [
-                    "Semakin besar",
-                    "Cenderung semakin kecil",
-                    "Selalu tetap",
-                    "Tidak dapat berubah"
+                    "Resultan cenderung semakin besar",
+                    "Resultan cenderung semakin kecil karena kedua gaya semakin saling meniadakan",
+                    "Resultan selalu tetap karena besar kedua gaya tidak berubah",
+                    "Arah resultan tidak mungkin berubah"
                 ],
                 1
             ),
 
             (
                 "C5 — Evaluasi",
-                """
-                Dalam percobaan nyata, hasil pengukuran dapat
-                berbeda sedikit dari hasil perhitungan teoritis.
-                Penyebab yang paling masuk akal adalah ...
-                """,
+                "Seorang siswa mengubah sudut salah satu gaya sementara besar kedua gaya tetap. "
+                "Ia kemudian melihat nilai Rx, Ry, R, dan θR berubah. Kesimpulan yang paling tepat adalah ...",
                 [
-                    "Kesalahan pembacaan alat dan ketidakidealan tali",
-                    "Resultan tidak memiliki arah",
-                    "Gaya tidak dapat dijumlahkan",
-                    "Sudut tidak berpengaruh terhadap gaya"
+                    "Perubahan sudut dapat mengubah komponen dan akhirnya memengaruhi besar serta arah resultan",
+                    "Perubahan sudut hanya mengubah tampilan grafik, bukan hasil fisika",
+                    "Resultan hanya dipengaruhi oleh massa sehingga sudut tidak perlu dicatat",
+                    "Rx dan Ry tidak berkaitan dengan besar resultan"
                 ],
                 0
             ),
 
             (
                 "C5 — Evaluasi",
-                """
-                Seorang siswa mengatakan bahwa dua gaya selalu
-                menghasilkan resultan yang lebih besar daripada
-                masing-masing gaya. Apakah pernyataan tersebut benar?
-                """,
+                "Seorang siswa mengatakan, 'Dua gaya selalu menghasilkan resultan yang lebih besar daripada "
+                "masing-masing gaya.' Berdasarkan konsep dan data eksperimen, penilaian yang tepat adalah ...",
                 [
                     "Benar untuk semua sudut",
-                    "Benar hanya jika gaya tegak lurus",
-                    "Tidak selalu; bergantung pada besar dan arah gaya",
-                    "Tidak ada hubungan antara gaya dan resultan"
+                    "Benar hanya ketika gaya saling berlawanan",
+                    "Tidak selalu; besar dan arah relatif kedua gaya menentukan resultannya",
+                    "Benar jika kedua gaya memiliki massa yang sama"
                 ],
                 2
             ),
 
             (
                 "C6 — Kreasi",
-                """
-                Jika kamu diminta membuat konfigurasi gaya dengan
-                resultan mendekati nol, konfigurasi yang paling
-                tepat adalah ...
-                """,
+                "Kamu diminta merancang satu percobaan yang menghasilkan resultan mendekati nol. "
+                "Konfigurasi yang paling tepat untuk dicoba adalah ...",
                 [
-                    "Gaya-gaya sama besar dan arahnya berlawanan",
-                    "Semua gaya searah",
-                    "Semua gaya membentuk sudut 90°",
-                    "Hanya menggunakan satu gaya"
+                    "Dua gaya sama besar dengan arah berlawanan (selisih sudut 180°)",
+                    "Dua gaya sama besar dengan arah sama (selisih sudut 0°)",
+                    "Dua gaya sama besar yang saling tegak lurus (selisih sudut 90°)",
+                    "Satu gaya saja tanpa gaya lainnya"
                 ],
                 0
             )
@@ -1598,14 +1600,9 @@ elif st.session_state.page == "HOTS":
 
         user_answers = []
 
-        for i, (level, question, options, correct) in enumerate(
-            questions
-        ):
+        for i, (level, question, options, correct) in enumerate(questions):
 
-            st.markdown(
-                f"### {level}"
-            )
-
+            st.markdown(f"### {level}")
             st.write(question)
 
             answer = st.radio(
@@ -1614,14 +1611,9 @@ elif st.session_state.page == "HOTS":
                 key=f"hots_{i}"
             )
 
-            user_answers.append(
-                options.index(answer)
-            )
+            user_answers.append(options.index(answer))
 
-        if st.button(
-            "Periksa Jawaban HOTS",
-            type="primary"
-        ):
+        if st.button("Periksa Jawaban HOTS", type="primary"):
 
             correct_count = sum(
                 user_answers[i] == questions[i][3]
@@ -1638,10 +1630,22 @@ elif st.session_state.page == "HOTS":
                 f"Skor HOTS: {st.session_state.hots_score}/100"
             )
 
+            # Umpan balik singkat agar HOTS berfungsi sebagai pembelajaran,
+            # bukan hanya sebagai penilaian.
+            explanations = [
+                "Perubahan besar atau arah gaya mengubah komponen Rx dan Ry, sehingga R dan/atau θR dapat berubah.",
+                "Untuk dua gaya yang sama besar, semakin mendekati 180° keduanya semakin saling meniadakan sehingga resultan mendekati nol.",
+                "Sudut menentukan proyeksi gaya pada sumbu x dan y. Karena itu perubahan sudut dapat mengubah Rx, Ry, R, dan θR.",
+                "Resultan bergantung pada besar dan arah relatif gaya. Pada sudut tertentu resultan dapat lebih kecil, sama, atau lebih besar daripada salah satu gaya.",
+                "Dua gaya yang sama besar dan berlawanan arah memiliki komponen yang saling meniadakan sehingga resultannya mendekati nol."
+            ]
+
+            st.markdown("### Pembahasan Singkat")
+            for i, explanation in enumerate(explanations, start=1):
+                st.write(f"**{i}.** {explanation}")
+
         if st.session_state.hots_done:
-
             if st.button("Lanjut ke Posttest →"):
-
                 st.session_state.page = "Posttest"
                 st.rerun()
 
@@ -1659,7 +1663,8 @@ elif st.session_state.page == "Posttest":
 
     st.markdown(
         '<div class="section-subtitle">'
-        'Kerjakan setelah menyelesaikan aktivitas virtual lab.'
+        'Kerjakan setelah menyelesaikan aktivitas virtual lab. '
+        'Beberapa soal mengharuskan kamu menghubungkan konsep dengan hasil eksperimen.'
         '</div>',
         unsafe_allow_html=True
     )
@@ -1667,61 +1672,44 @@ elif st.session_state.page == "Posttest":
     questions = [
 
         (
-            "1. Dua gaya 0,98 N dan 0,98 N saling tegak lurus. "
-            "Besar resultannya mendekati ...",
+            "1. Dua gaya 0,98 N dan 0,98 N saling tegak lurus. Besar resultannya mendekati ...",
+            ["0,98 N", "1,39 N", "1,96 N", "0 N"],
+            1
+        ),
+
+        (
+            "2. Dua gaya sama besar bekerja berlawanan arah. Resultannya adalah ...",
+            ["Dua kali gaya", "Setengah gaya", "Nol", "Tidak dapat ditentukan"],
+            2
+        ),
+
+        (
+            "3. Gaya 1 N pada 30° dan gaya 1 N pada 150° bekerja bersamaan. "
+            "Arah resultannya adalah ...",
+            ["0°", "45°", "90°", "180°"],
+            2
+        ),
+
+        (
+            "4. Dalam percobaan, besar dua gaya dibuat tetap tetapi sudut antara keduanya diperbesar "
+            "mendekati 180°. Berdasarkan konsep dan pola data virtual lab, kecenderungan besar resultan adalah ...",
             [
-                "0,98 N",
-                "1,39 N",
-                "1,96 N",
-                "0 N"
+                "Semakin besar karena kedua gaya semakin kuat",
+                "Cenderung semakin kecil karena kontribusi kedua gaya semakin saling meniadakan",
+                "Selalu tetap karena besar gaya tidak berubah",
+                "Tidak dapat berubah karena resultan hanya bergantung pada massa"
             ],
             1
         ),
 
         (
-            "2. Dua gaya sama besar bekerja berlawanan arah. "
-            "Resultannya adalah ...",
+            "5. Dari tabel hasil eksperimen, perubahan sudut dapat mengubah Rx, Ry, R, dan θR. "
+            "Penjelasan yang paling tepat adalah ...",
             [
-                "Dua kali gaya",
-                "Setengah gaya",
-                "Nol",
-                "Tidak dapat ditentukan"
-            ],
-            2
-        ),
-
-        (
-            "3. Gaya 1 N pada 30° dan gaya 1 N pada 150° bekerja "
-            "bersamaan. Arah resultannya adalah ...",
-            [
-                "0°",
-                "45°",
-                "90°",
-                "180°"
-            ],
-            2
-        ),
-
-        (
-            "4. Gaya 0,98 N pada 0° dan gaya 0,49 N pada 180°. "
-            "Besar resultannya adalah ...",
-            [
-                "0,49 N",
-                "1,47 N",
-                "0,98 N",
-                "0 N"
-            ],
-            0
-        ),
-
-        (
-            "5. Dua gaya yang sama besar dapat menghasilkan resultan "
-            "yang arahnya 45° jika kedua gaya berada pada arah ...",
-            [
-                "0° dan 90°",
-                "0° dan 180°",
-                "90° dan 180°",
-                "180° dan 270°"
+                "Sudut menentukan komponen gaya pada sumbu x dan y, sehingga resultan dapat berubah",
+                "Sudut hanya memengaruhi warna vektor pada simulasi",
+                "Sudut tidak berhubungan dengan komponen gaya",
+                "Resultan hanya ditentukan oleh jumlah percobaan"
             ],
             0
         )
@@ -1737,14 +1725,9 @@ elif st.session_state.page == "Posttest":
             key=f"post_{i}"
         )
 
-        answers.append(
-            options.index(answer)
-        )
+        answers.append(options.index(answer))
 
-    if st.button(
-        "Periksa Posttest",
-        type="primary"
-    ):
+    if st.button("Periksa Posttest", type="primary"):
 
         correct_count = sum(
             answers[i] == questions[i][2]
@@ -1761,13 +1744,14 @@ elif st.session_state.page == "Posttest":
             f"Skor posttest: {st.session_state.posttest_score}/100"
         )
 
+        st.info(
+            "Posttest menilai pemahaman konsep setelah siswa melakukan eksperimen, "
+            "sehingga soal tidak hanya berfokus pada perhitungan tetapi juga interpretasi "
+            "hubungan besar, arah, komponen, dan resultan vektor."
+        )
+
     if st.session_state.posttest_done:
-
-        if st.button(
-            "Lihat Hasil Praktikum →",
-            type="primary"
-        ):
-
+        if st.button("Lihat Hasil Praktikum →", type="primary"):
             st.session_state.page = "Hasil"
             st.rerun()
 
